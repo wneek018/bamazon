@@ -30,7 +30,6 @@ function showOptions() {
             "Exit \n"
         ]
     }).then(function (answer) {
-        //console.log("You've chosen to " + answer.managerOptions);
         switch (answer.managerOptions) {
             case "View Products for Sale":
                 viewProducts();
@@ -45,7 +44,7 @@ function showOptions() {
                 break;
 
             case "Add New Product":
-                // addNewProduct();
+                addNewProduct();
                 break;
 
             case "Exit":
@@ -129,4 +128,41 @@ function updateInv() {
 function addInventory() {
     // make sure the updateInv() starts AFTER running the viewProducts function
     viewProducts().then(updateInv);
+}
+
+function addNewProduct() {
+    inquirer.prompt([
+        {
+            name: "productName",
+            type: "input",
+            message: "What is the name of the product you would like to add?"
+        },
+        {
+            name: "departmentName",
+            type: "input",
+            message: "What department does this product belong to?"
+        },
+        {
+            name: "productPrice",
+            type: "input",
+            message: "How much does one of these cost?",
+        },
+        {
+            name: "quantity",
+            type: "input",
+            message: "How many units will we add?"
+        }
+    ]).then (function(answer) {
+        connection.query("INSERT INTO products SET ?",
+        {
+            product_name: answer.productName,
+            department_name: answer.departmentName,
+            price: answer.productPrice,
+            stock_quantity: answer.quantity
+        }, 
+        function (err, res) {
+            if (err) throw err;
+            console.log("New product added.");
+        });
+    });
 }
