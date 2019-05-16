@@ -21,7 +21,7 @@ function showOptions() {
     inquirer.prompt({
         name: "managerOptions",
         type: "list",
-        message: "What would you like to do? Press Enter to select.",
+        message: "What would you like to do? Press return to select.",
         choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
     }).then(function(answer) {
         // switch statement based on their choice
