@@ -21,11 +21,68 @@ function showOptions() {
     inquirer.prompt({
         name: "managerOptions",
         type: "list",
-        message: "What would you like to do? Press return to select.",
-        choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
-    }).then(function(answer) {
-        // switch statement based on their choice
-        console.log("You've chosen to " + answer.managerOptions);
-        connection.end();
+        message: "What would you like to do?",
+        choices: [
+            "View Products for Sale",
+            "View Low Inventory",
+            "Add to Inventory",
+            "Add New Product",
+            "Exit"
+        ]
+    }).then(function (answer) {
+        //console.log("You've chosen to " + answer.managerOptions);
+        switch (answer.managerOptions) {
+            case "View Products for Sale":
+                viewProducts();
+                break;
+
+            case "View Low Inventory":
+                viewInventory();
+                break;
+
+            case "Add to Inventory":
+                // addInventory();
+                break;
+
+            case "Add New Product":
+                // addNewProduct();
+                break;
+
+            case "Exit":
+                connection.end();
+                break;
+        }
+    });
+}
+
+function viewProducts() {
+    console.log("Viewing all products for sale: \n");
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            console.log(
+                "Item ID: " + res[i].item_id + "\n" +
+                "Product Name: " + res[i].product_name + "\n" +
+                "Price: " + res[i].price + "\n" +
+                "Quantity: " + res[i].stock_quantity + "\n"
+            );
+        }
+        showOptions();
+    });
+}
+
+function viewInventory() {
+    console.log("Products with Low Inventory: \n");
+    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            console.log(
+                "Item ID: " + res[i].item_id + "\n" +
+                "Product Name: " + res[i].product_name + "\n" +
+                "Price: " + res[i].price + "\n" +
+                "Quantity: " + res[i].stock_quantity + "\n"
+            );
+        }
+        showOptions();
     });
 }
