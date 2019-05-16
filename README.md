@@ -20,6 +20,34 @@ DB_PASS=yourpassword
 DB_USER=youruser
 ```
 
+## Initial MySQL setup
+Run this code in MySQL to set up a database and table for your products.
+```
+DROP DATABASE IF EXISTS bamazonDB;
+CREATE DATABASE bamazonDB;
+
+USE bamazonDB;
+
+CREATE TABLE products (
+    item_id INT NOT NULL AUTO_INCREMENT,
+    product_name VARCHAR(45) NULL,
+    department_name VARCHAR(45) NULL,
+    price DECIMAL(10,2) NULL,
+    stock_quantity INT NOT NULL,
+    PRIMARY KEY (item_id)
+);
+```
+Add some products and information to fill your new table.
+```
+USE bamazonDB;
+
+INSERT INTO products (product_name, department_name, price, stock_quantity)
+VALUES ("running shoes", "sports & outdoors", 75.00, 10),
+("cashew snack pack", "food & beverage", 2.50, 25),
+("kleenex", "home & kitchen", 3.00, 50),
+("marbles", "games & entertainment", 5.25, 15),
+```
+
 ## JavaScript Files
 
 * bamazonCustomer.js - the user can run this file in node to view all products in our MySQL database, and order any products with the quantities available.
