@@ -32,15 +32,16 @@ function showOptions() {
     }).then(function (answer) {
         switch (answer.managerOptions) {
             case "View Products for Sale":
-                viewProducts();
+                viewProducts().then(showOptions);
                 break;
 
             case "View Low Inventory":
-                viewInventory();
+                viewLowInventory().then(showOptions);
                 break;
 
             case "Add to Inventory":
-                addInventory();
+                // TODO: make showOptions function work after addInv is run
+                addInventory().then(showOptions);
                 break;
 
             case "Add New Product":
@@ -73,19 +74,23 @@ function viewProducts() {
     return promise;
 }
 
-function viewInventory() {
+function viewLowInventory() {
     console.log("Products with Low Inventory: \n");
-    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
-        if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            console.log(
-                "Item ID: " + res[i].item_id + "\n" +
-                "Product Name: " + res[i].product_name + "\n" +
-                "Price: " + res[i].price + "\n" +
-                "Quantity: " + res[i].stock_quantity + "\n"
-            );
-        }
+    var promise = new Promise(function (resolve, reject) {
+        connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
+            if (err) throw err;
+            for (var i = 0; i < res.length; i++) {
+                console.log(
+                    "Item ID: " + res[i].item_id + "\n" +
+                    "Product Name: " + res[i].product_name + "\n" +
+                    "Price: " + res[i].price + "\n" +
+                    "Quantity: " + res[i].stock_quantity + "\n"
+                );
+            }
+            resolve();
+        });
     });
+    return promise;
 }
 
 function updateInv() {
@@ -101,28 +106,31 @@ function updateInv() {
             message: "How many units would you like to add?"
         }
     ]).then(function (answer) {
-        connection.query("SELECT * FROM products", function (err, res) {
-            if (err) throw err;
-            var chosenProduct = "";
-            for (var i = 0; i < res.length; i++) {
-                if (res[i].item_id === parseInt(answer.productId)) {
-                    chosenProduct = res[i];
-                }
-            }
-            connection.query("UPDATE products SET ? WHERE ?", [
-                {
-                    stock_quantity: (chosenProduct.stock_quantity + parseInt(answer.quantity))
-                },
-                {
-                    item_id: chosenProduct.item_id
-                }
-            ], function (err, res) {
+        var promise = new Promise(function (resolve, reject) {
+            connection.query("SELECT * FROM products", function (err, res) {
                 if (err) throw err;
-                console.log(chosenProduct.product_name + " inventory line updated.");
-            })
+                var chosenProduct = "";
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].item_id === parseInt(answer.productId)) {
+                        chosenProduct = res[i];
+                    }
+                }
+                connection.query("UPDATE products SET ? WHERE ?", [
+                    {
+                        stock_quantity: (chosenProduct.stock_quantity + parseInt(answer.quantity))
+                    },
+                    {
+                        item_id: chosenProduct.item_id
+                    }
+                ], function (err, res) {
+                    if (err) throw err;
+                    console.log(chosenProduct.product_name + " inventory line updated.");
+                });
+                resolve();
+            });
         });
+        return promise;
     });
-    showOptions();
 }
 
 function addInventory() {
@@ -152,17 +160,17 @@ function addNewProduct() {
             type: "input",
             message: "How many units will we add?"
         }
-    ]).then (function(answer) {
+    ]).then(function (answer) {
         connection.query("INSERT INTO products SET ?",
-        {
-            product_name: answer.productName,
-            department_name: answer.departmentName,
-            price: answer.productPrice,
-            stock_quantity: answer.quantity
-        }, 
-        function (err, res) {
-            if (err) throw err;
-            console.log("New product added.");
-        });
+            {
+                product_name: answer.productName,
+                department_name: answer.departmentName,
+                price: answer.productPrice,
+                stock_quantity: answer.quantity
+            },
+            function (err, res) {
+                if (err) throw err;
+                console.log("New product added.");
+            });
     });
 }
