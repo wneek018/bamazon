@@ -2,7 +2,7 @@
 This app takes in customer orders using node.js and updates inventory (MySQL) when a product is ordered.
 
 ## Demo:
-<link goes here>
+https://drive.google.com/file/d/1C60c2Gl-rq3cXk_mhoOYQ6JeW3pRW0_x/view?usp=sharing
 
 ## Getting Started:
 
